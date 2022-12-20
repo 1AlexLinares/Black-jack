@@ -27,6 +27,32 @@ const optionAlert = {
   },
 };
 
+function botSum (arr){
+
+  let sum = 0
+
+  for (let i = 0; i < arr.length; i++) {
+
+    if (arr[i].valor == 11 || arr[i].valor == 12 || arr[i].valor == 13) {
+      
+      sum += 10;
+
+    } else if (arr[i].valor == 1) {
+      
+      sum += botLogic(sum);
+
+    } else {
+      
+      sum += arr[i].valor;
+
+    }
+  }
+
+  console.log("Soy la suma del bot" +sum);
+return sum;
+
+}
+
 const endGame = (Ente) => {
   swal.fire({
     title: "El ganador es : " + Ente,
@@ -36,8 +62,75 @@ const endGame = (Ente) => {
     icon: "warning",
   });
 
-  setTimeout(() => {window.reload()}, 30000); //*Ojo con el tiempo
+  setTimeout(() => {location.reload()}, 3000); //*Ojo con el tiempo
 };
+
+function ganador(resultadoBot,resultadoPlayer){
+
+  resultadoBot = 21 - resultadoBot;
+  resultadoPlayer = 21 - resultadoPlayer; 
+
+  if(resultadoBot < resultadoPlayer && resultadoBot <= 21 && resultadoBot >= 0){
+   
+    endGame("BOT");
+
+  }else if( resultadoBot == resultadoPlayer){
+
+    document.write("Nadie gano y todos se murieron");
+
+  }else if (resultadoBot < resultadoPlayer && resultadoPlayer <= 21 && resultadoPlayer >= 0){
+
+    endGame("player");
+
+  }
+
+
+
+}
+
+const quedar = function (arrBot,cartaExample,baraja){
+
+  let nodoPadre = document.getElementById("botBaraja");
+
+
+  let clon = cartaExample.cloneNode(true);
+
+    let img = arrBot[0].img;
+    console.log(img);
+    clon.id = "cart";
+    clon.className = "cardbot"
+    
+
+  nodoPadre.replaceChild(clon,document.getElementById("cardbot0"))
+  document.querySelector("#cart").id = "cardbot0"
+  document.querySelector("#cardbot0").src = img + ".png";
+
+  let primer = sumArray(arrBot,"Bot") 
+
+  
+  primer.then(valor =>{
+            
+    let cambioPromesa = valor
+    let comprobante = 0;
+
+    while(cambioPromesa < 20){
+      console.log("Cambio de variable exogena " +cambioPromesa);
+      comprobante += 1;
+      console.log(comprobante);
+
+  
+      cambioPromesa = Pedir(arrBot,baraja,"bot",cartaExample,sumArray);
+
+
+    }
+
+    ponerSumEnTablero(cambioPromesa,"Bot")
+
+    ganador(cambioPromesa,sumGlobal);
+  })
+
+}
+
 
 function ponerSumEnTablero(sum, ente) {
   //!Hay que acomodar el puntaje para el bot cuando se presione me quedo
@@ -148,6 +241,7 @@ function Pedir(arr, baraja, ente = "player", cartaexample, promesaSecuencial) {
     console.log(arr.length-1)
     id = "cardplayer"+(arr.length-1);
   } else {
+    console.log("Estoy acá")
     place = document.getElementById("botBaraja");
     clase = "cardbot";
     id = "cardbot"+(arr.length-1);
@@ -165,11 +259,18 @@ function Pedir(arr, baraja, ente = "player", cartaexample, promesaSecuencial) {
   document.getElementById(clone.id).src = img + valor+".png";
 
   //Sumatoria por ente
-  promesaSecuencial(arr, "player", sumGlobal).then((valor) => {
-    sumGlobal = valor;      
-    console.log(sumGlobal);
-    ponerSumEnTablero(sumGlobal, ente);
-  });
+  if(ente == "player"){
+    promesaSecuencial(arr, ente, sumGlobal).then((valor) => {
+      sumGlobal = valor;      
+      console.log(sumGlobal);
+      ponerSumEnTablero(sumGlobal, ente);
+    });
+  }else{
+    console.log("Estoy cerca")
+    return botSum(arr);
+
+  }
+
 }
 
 var animateButton = function (e) {
@@ -243,7 +344,7 @@ function ponerBotones(borrado) {
 
   pedir.removeEventListener("click", newGame);
   pedir.onclick = "";
-  pedir.innerText = "pedir";
+  pedir.innerText = "Pedir";
   pedir.id = "pedir";
 
   place.appendChild(pedir);
@@ -281,8 +382,7 @@ async function sumArray(arr, ente, sumAnterior = null) {
       title: "Usted tiene un AS",
       icon: "question",
       text: "¿ Qué valor deseas tomar?",
-      confirmButtonText: "Gamblind",
-      footer: "<center>Consejo del día<br><br>NO MIRES ATRAS</center>",
+      confirmButtonText: "ACEPTAR",
       allowOutsideClick: false, //!Propiedad que permite que la ventana
       allowEscapeKey: false, //!No permite que otros eventos por tecla funcione
       allowEnterKey: true, //!Bloque la función de ENTER en el popUp
@@ -540,7 +640,8 @@ function newGame() {
   })
 
   document.getElementById("quedar").addEventListener("click", (_) => {
-    console.log("Saludos desde el boton Quedar");
+    
+    quedar(bot,eliminado,baraja)
   });
 
 
